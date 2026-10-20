@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Power-Up Learning Journey</title>
+
+<style>
+body {
+    background: #121212;
+    color: white;
+    font-family: Segoe UI, sans-serif;
+    margin: 0;
+    padding: 30px;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+.progress-container {
+    background: #2b2b2b;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.progress-bar {
+    height: 20px;
+    width: 0%;
+    background: #43d18d;
+    transition: 0.3s;
+}
+
+.progress-text {
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+    gap: 20px;
+}
+
+.course-card {
+    background: #2a2a2a;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.course-card:hover {
+    transform: translateY(-3px);
+}
+
+.course-card.completed {
+    background: #43d18d;
+    color: black;
+}
+
+.course-number {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.actions {
+    margin-top: 15px;
+}
+
+button {
+    background: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+button:hover {
+    opacity: .9;
+}
+
+.completed-label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>🚀 Power-Up Learning Journey</h1>
+
+<div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div class="progress-text" id="progressText">
+    0% Completed
+</div>
+
+<div class="course-grid" id="courseGrid"></div>
+
+<script>
+
+const courses = [
+{
+ id:1,
+ name:"Marketing Fundamentals",
+ url:"https://example.com/course1"
+},
+{
+ id:2,
+ name:"Market Research in Marketing and Advertising",
+ url:"https://example.com/course2"
+},
+{
+ id:3,
+ name:"SEO Basic",
+ url:"https://example.com/course3"
+},
+{
+ id:4,
+ name:"AI Visibility",
+ url:"https://example.com/course4"
+},
+{
+ id:5,
+ name:"Briefs with Impact",
+ url:"https://example.com/course5"
+},
+{
+ id:6,
+ name:"Paid Social Media — General",
+ url:"https://example.com/course6"
+},
+{
+ id:7,
+ name:"Marketing Effectiveness",
+ url:"https://example.com/course7"
+},
+{
+ id:8,
+ name:"Introduction to DMS",
+ url:"https://example.com/course8"
+}
+];
+
+const courseGrid = document.getElementById("courseGrid");
+
+function createCourses() {
+
+    courseGrid.innerHTML = "";
+
+    courses.forEach(course => {
+
+        const completed =
+            localStorage.getItem(
+                "course_" + course.id
+            ) === "completed";
+
+        const card = document.createElement("div");
+        card.className =
+            "course-card" +
+            (completed ? " completed" : "");
+
+        card.innerHTML = `
+            <div>
+                ${completed ? "✅" : "⬜"}
+                <span class="course-number">${course.id}.</span>
+                ${course.name}
+            </div>
+
+            <div class="actions">
+
+                <button onclick="openCourse('${course.url}')">
+                    Start Course
+                </button>
+
+                ${
+                completed
+                ?
+                `<div class="completed-label">
+                    Completed
+                 </div>`
+                :
+                `<button onclick="completeCourse(${course.id})">
+                    Mark Complete
+                 </button>`
+                }
+
+            </div>
+        `;
+
+        courseGrid.appendChild(card);
+
+    });
+
+    updateProgress();
+}
+
+function openCourse(url){
+    window.open(url,"_blank");
+}
+
+function completeCourse(id){
+
+    localStorage.setItem(
+        "course_" + id,
+        "completed"
+    );
+
+    createCourses();
+}
+
+function updateProgress(){
+
+    let completed = 0;
+
+    courses.forEach(course => {
+
+        if(
+            localStorage.getItem(
+                "course_" + course.id
+            ) === "completed"
+        ){
+            completed++;
+        }
+
+    });
+
+    const percentage =
+    Math.round(
+        completed /
+        courses.length *
+        100
+    );
+
+    document.getElementById("progressBar")
+        .style.width =
+        percentage + "%";
+
+    document.getElementById("progressText")
+        .innerHTML =
+        `✅ ${completed} of ${courses.length} completed (${percentage}%)`;
+}
+
+createCourses();
+
+</script>
+
+</body>
+</html>
