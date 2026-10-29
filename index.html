@@ -29,6 +29,7 @@ button:hover { opacity:.9; }
     <div class="progress-bar" id="progressBar"></div>
 </div>
 <div class="progress-text" id="progressText">0% Completed</div>
+<button type="button" onclick="resetProgress()" style="margin-bottom:20px;">Reset progress</button>
 <div class="course-grid" id="courseGrid"></div>
 
 <script>
@@ -110,5 +111,9 @@ function updateProgress() {
 
 createCourses();
 </script>
+function resetProgress() {
+    courses.forEach(course => localStorage.removeItem("course_" + course.id));
+    createCourses();
+}
 </body>
 </html>
