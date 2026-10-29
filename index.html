@@ -109,11 +109,11 @@ function updateProgress() {
         `✅ ${completed} of ${courses.length} completed (${percentage}%)`;
 }
 
-createCourses();
-</script>
 function resetProgress() {
     courses.forEach(course => localStorage.removeItem("course_" + course.id));
     createCourses();
 }
+createCourses();
+</script>
 </body>
 </html>
