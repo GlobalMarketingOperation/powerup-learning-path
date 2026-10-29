@@ -234,7 +234,7 @@ async function completeCourse(id) {
                 "completed"
             );
 
-            showMessage("Course marked as completed! 🎉");
+            alert("Course marked as completed!");
 
             createCourses();
 
@@ -243,7 +243,7 @@ async function completeCourse(id) {
             const errorText = await response.text();
             console.error(errorText);
 
-            showMessage("Something went wrong. Please try again.", true);
+            alert("Flow error. Check Power Automate run history.");
 
         }
 
@@ -251,7 +251,7 @@ async function completeCourse(id) {
 
         console.error(error);
 
-        showMessage("Connection error. Please try again.", true);
+           alert("Connection error. Check browser console.");
 
     }
 
