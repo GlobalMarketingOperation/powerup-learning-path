@@ -3,92 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Power-Up Learning Journey</title>
-
 <style>
-body {
-    background: #121212;
-    color: white;
-    font-family: Segoe UI, sans-serif;
-    margin: 0;
-    padding: 30px;
-}
-
-h1 {
-    margin-bottom: 10px;
-}
-
-.progress-container {
-    background: #2b2b2b;
-    border-radius: 20px;
-    overflow: hidden;
-    margin-bottom: 30px;
-}
-
-.progress-bar {
-    height: 20px;
-    width: 0%;
-    background: #43d18d;
-    transition: 0.3s;
-}
-
-.progress-text {
-    margin-top: 10px;
-    margin-bottom: 30px;
-}
-
-.course-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
-    gap: 20px;
-}
-
-.course-card {
-    background: #2a2a2a;
-    border-radius: 8px;
-    padding: 20px;
-    cursor: pointer;
-    transition: .2s;
-}
-
-.course-card:hover {
-    transform: translateY(-3px);
-}
-
-.course-card.completed {
-    background: #43d18d;
-    color: black;
-}
-
-.course-number {
-    font-weight: bold;
-    margin-right: 5px;
-}
-
-.actions {
-    margin-top: 15px;
-}
-
-button {
-    background: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-right: 8px;
-}
-
-button:hover {
-    opacity: .9;
-}
-
-.completed-label {
-    font-weight: bold;
-    margin-top: 10px;
-}
+body { background:#121212; color:white; font-family:Segoe UI, sans-serif; margin:0; padding:30px; }
+h1 { margin-bottom:10px; }
+.progress-container { background:#2b2b2b; border-radius:20px; overflow:hidden; margin-bottom:30px; }
+.progress-bar { height:20px; width:0%; background:#43d18d; transition:0.3s; }
+.progress-text { margin-top:10px; margin-bottom:30px; }
+.course-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+.course-card { background:#2a2a2a; border-radius:8px; padding:20px; cursor:pointer; transition:.2s; }
+.course-card:hover { transform:translateY(-3px); }
+.course-card.completed { background:#43d18d; color:black; }
+.course-number { font-weight:bold; margin-right:5px; }
+.actions { margin-top:15px; }
+button { background:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; margin-right:8px; }
+button:hover { opacity:.9; }
+.completed-label { font-weight:bold; margin-top:10px; }
 </style>
-
 </head>
 <body>
 
@@ -97,201 +28,87 @@ button:hover {
 <div class="progress-container">
     <div class="progress-bar" id="progressBar"></div>
 </div>
-
-<div class="progress-text" id="progressText">
-    0% Completed
-</div>
-
+<div class="progress-text" id="progressText">0% Completed</div>
 <div class="course-grid" id="courseGrid"></div>
 
 <script>
+const FLOW_URL = "https://0458ee4aa906e0628640d9914f2d48.4c.environment.api.powerplatform.com/powerautomate/automations/direct/cu/11/workflows/f9a80b1b49ff474a94bc0e429a4ad180/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=V2KkkwbJeGPGyCv8WqbrR6-ASLlCswXuNwJQLC-p3E8";
 
 const courses = [
-{
- id:1,
- name:"Marketing Fundamentals",
- url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up-Marketing-Fundamentals.aspx?CT=1779883202941&OR=OWA-NT-Mail&CID=af1b33a8-fe26-13a4-9f9e-3a3ea364d9e1"
-},
-{
- id:2,
- name:"Market Research in Marketing and Advertising",
- url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Market%20and%20Advertisement%20Research%20-%20Domain%20page.aspx?csf=1&web=1&e=yBpyTv"
-},
-{
- id:3,
- name:"SEO Basic",
- url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up%20Search%20-%20SEO%20Basic.aspx"
-},
-{
- id:4,
- name:"AI Visibility",
- url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up--AI---AI-Visibility.aspx"
-},
-{
- id:5,
- name:"Briefs with Impact",
- url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up%20Content%20House%20-%20Briefs%20with%20Impact.aspx?web=1"
-},
-{
- id:6,
- name:"Paid Social Media — General",
- url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up%20Paid%20Social%20Media%20-%20General.aspx"
-},
-{
- id:7,
- name:"Marketing Effectiveness",
- url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Marketing%20Effectiveness%20-%20Domain%20page.aspx?csf=1&web=1&e=DlGLaQ"
-},
-{
- id:8,
- name:"Introduction to DMS",
- url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up%20Introduction%20to%20DMS.aspx"
-}
+ { id:1, name:"Marketing Fundamentals", url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up-Marketing-Fundamentals.aspx" },
+ { id:2, name:"Market Research in Marketing and Advertising", url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Market%20and%20Advertisement%20Research%20-%20Domain%20page.aspx" },
+ { id:3, name:"SEO Basic", url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up%20Search%20-%20SEO%20Basic.aspx" },
+ { id:4, name:"AI Visibility", url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up--AI---AI-Visibility.aspx" },
+ { id:5, name:"Briefs with Impact", url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up%20Content%20House%20-%20Briefs%20with%20Impact.aspx" },
+ { id:6, name:"Paid Social Media — General", url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up%20Paid%20Social%20Media%20-%20General.aspx" },
+ { id:7, name:"Marketing Effectiveness", url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Marketing%20Effectiveness%20-%20Domain%20page.aspx" },
+ { id:8, name:"Introduction to DMS", url:"https://share.lighting.com/teams/GlobalBrandMarketing/Power-Up/SitePages/Power-Up%20Introduction%20to%20DMS.aspx" }
 ];
 
 const courseGrid = document.getElementById("courseGrid");
 
 function createCourses() {
-
     courseGrid.innerHTML = "";
-
     courses.forEach(course => {
-
-        const completed =
-            localStorage.getItem(
-                "course_" + course.id
-            ) === "completed";
-
+        const completed = localStorage.getItem("course_" + course.id) === "completed";
         const card = document.createElement("div");
-        card.className =
-            "course-card" +
-            (completed ? " completed" : "");
-
+        card.className = "course-card" + (completed ? " completed" : "");
         card.innerHTML = `
             <div>
                 ${completed ? "✅" : "⬜"}
                 <span class="course-number">${course.id}.</span>
                 ${course.name}
             </div>
-
             <div class="actions">
-
-                <button onclick="openCourse('${course.url}')">
-                    Start Course
-                </button>
-
-                ${
-                completed
-                ?
-                `<div class="completed-label">
-                    Completed
-                 </div>`
-                :
-                `<button onclick="completeCourse(${course.id})">
-                    Mark Complete
-                 </button>`
-                }
-
-            </div>
-        `;
-
+                <button type="button" onclick="openCourse('${course.url}')">Start Course</button>
+                ${completed
+                    ? `<div class="completed-label">Completed</div>`
+                    : `<button type="button" onclick="completeCourse(${course.id})">Mark Complete</button>`}
+            </div>`;
         courseGrid.appendChild(card);
-
     });
-
     updateProgress();
 }
 
-function openCourse(url){
-    window.open(url,"_blank");
+function openCourse(url) {
+    window.open(url, "_blank");
 }
 
 async function completeCourse(id) {
-
     const course = courses.find(c => c.id === id);
-
     try {
-
-        const response = await fetch(
-            "https://0458ee4aa906e0628640d9914f2d48.4c.environment.api.powerplatform.com/powerautomate/automations/direct/cu/11/workflows/f9a80b1b49ff474a94bc0e429a4ad180/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=V2KkkwbJeGPGyCv8WqbrR6-ASLlCswXuNwJQLC-p3E8",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    courseId: course.id,
-                    courseName: course.name,
-                    status: "Completed"
-                })
-            }
-        );
-
+        const response = await fetch(FLOW_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                courseId: course.id,
+                courseName: course.name,
+                status: "Completed"
+            })
+        });
         if (response.ok) {
-
-            localStorage.setItem(
-                "course_" + id,
-                "completed"
-            );
-
-            alert("Course marked as completed!");
-
+            localStorage.setItem("course_" + id, "completed");
             createCourses();
-
         } else {
-
-            const errorText = await response.text();
-            console.error(errorText);
-
-            alert("Flow error. Check Power Automate run history.");
-
+            console.error(await response.text());
         }
-
     } catch (error) {
-
         console.error(error);
-
-           alert("Connection error. Check browser console.");
-
     }
-
 }
 
-function updateProgress(){
-
+function updateProgress() {
     let completed = 0;
-
     courses.forEach(course => {
-
-        if(
-            localStorage.getItem(
-                "course_" + course.id
-            ) === "completed"
-        ){
-            completed++;
-        }
-
+        if (localStorage.getItem("course_" + course.id) === "completed") completed++;
     });
-
-    const percentage =
-    Math.round(
-        completed /
-        courses.length *
-        100
-    );
-
-    document.getElementById("progressBar")
-        .style.width =
-        percentage + "%";
-
-    document.getElementById("progressText")
-        .innerHTML =
+    const percentage = Math.round(completed / courses.length * 100);
+    document.getElementById("progressBar").style.width = percentage + "%";
+    document.getElementById("progressText").innerHTML =
         `✅ ${completed} of ${courses.length} completed (${percentage}%)`;
 }
 
 createCourses();
-
 </script>
-
 </body>
 </html>
