@@ -107,15 +107,15 @@ async function completeCourse(id) {
 
         if (response.ok) {
             localStorage.setItem("course_" + id, "completed");
-            alert("Course marked as completed!");
+            
             createCourses();
         } else {
             console.error(await response.text());
-            alert("Flow error. Check Power Automate run history.");
+            
         }
     } catch (error) {
         console.error(error);
-        alert("Connection error. Check browser console.");
+        
     }
 }
 
