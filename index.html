@@ -96,7 +96,7 @@ async function completeCourse(id) {
     try {
         const response = await fetch(FLOW_URL, {
             method: "POST",
-            headers: { "Content-Type": "text/plain" },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 userEmail: userEmail,
                 courseId: course.id,
