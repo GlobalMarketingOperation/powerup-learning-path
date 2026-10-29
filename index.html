@@ -151,52 +151,55 @@ const courses = [
 
 const courseGrid = document.getElementById("courseGrid");
 
-function getUserEmail() {
-    let email = localStorage.getItem("powerup_email");
-    if (!email) {
-        email = prompt("Please enter your Signify email to save your progress:");
-        if (!email || !email.includes("@")) {
-            alert("A valid email is needed to save your progress.");
-            return null;
-        }
-        email = email.trim().toLowerCase();
-        localStorage.setItem("powerup_email", email);
-    }
-    return email;
-}
+function createCourses() {
 
-async function completeCourse(id) {
-    const course = courses.find(c => c.id === id);
-    const userEmail = getUserEmail();
-    if (!userEmail) return;
+    courseGrid.innerHTML = "";
 
-    try {
-        const response = await fetch(
-            "PASTE_YOUR_FLOW_URL_HERE",
-            {
-                method: "POST",
-                headers: { "Content-Type": "text/plain" },
-                body: JSON.stringify({
-                    userEmail: userEmail,
-                    courseId: course.id,
-                    courseName: course.name,
-                    status: "Completed"
-                })
-            }
-        );
+    courses.forEach(course => {
 
-        if (response.ok) {
-            localStorage.setItem("course_" + id, "completed");
-            alert("Course marked as completed!");
-            createCourses();
-        } else {
-            console.error(await response.text());
-            alert("Flow error. Check Power Automate run history.");
-        }
-    } catch (error) {
-        console.error(error);
-        alert("Connection error. Check browser console.");
-    }
+        const completed =
+            localStorage.getItem(
+                "course_" + course.id
+            ) === "completed";
+
+        const card = document.createElement("div");
+        card.className =
+            "course-card" +
+            (completed ? " completed" : "");
+
+        card.innerHTML = `
+            <div>
+                ${completed ? "✅" : "⬜"}
+                <span class="course-number">${course.id}.</span>
+                ${course.name}
+            </div>
+
+            <div class="actions">
+
+                <button onclick="openCourse('${course.url}')">
+                    Start Course
+                </button>
+
+                ${
+                completed
+                ?
+                `<div class="completed-label">
+                    Completed
+                 </div>`
+                :
+                `<button onclick="completeCourse(${course.id})">
+                    Mark Complete
+                 </button>`
+                }
+
+            </div>
+        `;
+
+        courseGrid.appendChild(card);
+
+    });
+
+    updateProgress();
 }
 
 function openCourse(url){
