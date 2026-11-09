@@ -18,7 +18,21 @@ h1 { margin-bottom:10px; }
 .actions { margin-top:15px; }
 button { background:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; margin-right:8px; }
 button:hover { opacity:.9; }
+button:disabled { opacity:.4; cursor:not-allowed; }
 .completed-label { font-weight:bold; margin-top:10px; }
+
+/* Prize draw section */
+.giveaway { margin-top:40px; background:#1e1e1e; border:2px solid #43d18d; border-radius:12px; padding:25px; max-width:700px; }
+.giveaway h2 { margin-top:0; color:#43d18d; }
+.giveaway p { line-height:1.5; }
+.giveaway .small-print { font-size:13px; color:#bdbdbd; }
+.email-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:15px; }
+.email-row input[type="email"] { flex:1; min-width:220px; padding:10px; border-radius:6px; border:none; font-size:14px; }
+.email-row button { background:#43d18d; color:black; font-weight:bold; padding:10px 18px; }
+.consent { display:flex; gap:8px; align-items:flex-start; margin-top:12px; font-size:13px; color:#bdbdbd; }
+.giveaway-message { margin-top:12px; font-weight:bold; }
+.giveaway-message.success { color:#43d18d; }
+.giveaway-message.error { color:#ff6b6b; }
 </style>
 </head>
 <body>
@@ -30,6 +44,33 @@ button:hover { opacity:.9; }
 </div>
 <div class="progress-text" id="progressText">0% Completed</div>
 <div class="course-grid" id="courseGrid"></div>
+
+<!-- Prize draw section -->
+<div class="giveaway" id="giveaway">
+    <h2>🏎️ Win a Formula 1 cap or T-shirt!</h2>
+    <p>
+        Do you want the chance to win a <strong>special Formula 1 cap or T-shirt</strong>
+        celebrating our partnership with Mercedes in F1? Finish at least one Power-Up course
+        and add your email in the box below.
+    </p>
+    <p class="small-print">
+        Please note: by sharing your email, you agree that it will be used only to send you
+        information about the prize draw and to contact you if you win.
+        The prize draw takes place once a month.
+    </p>
+
+    <div class="email-row">
+        <input type="email" id="giveawayEmail" placeholder="your.name@signify.com" aria-label="Your email">
+        <button type="button" id="giveawayButton" onclick="submitGiveaway()">Join the Prize Draw</button>
+    </div>
+
+    <label class="consent">
+        <input type="checkbox" id="giveawayConsent">
+        I agree that my email is used only for this prize draw.
+    </label>
+
+    <div class="giveaway-message" id="giveawayMessage" aria-live="polite"></div>
+</div>
 
 <script>
 const FLOW_URL = "https://0458ee4aa906e0628640d9914f2d48.4c.environment.api.powerplatform.com/powerautomate/automations/direct/cu/11/workflows/f9a80b1b49ff474a94bc0e429a4ad180/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=V2KkkwbJeGPGyCv8WqbrR6-ASLlCswXuNwJQLC-p3E8";
@@ -68,66 +109,98 @@ function createCourses() {
         courseGrid.appendChild(card);
     });
     updateProgress();
+    updateGiveawayState();
 }
 
 function openCourse(url) {
     window.open(url, "_blank");
 }
 
-function getUserEmail() {
-    let email = localStorage.getItem("powerup_email");
-    if (!email) {
-        email = prompt("Please enter your Signify email to save your progress:");
-        if (!email || !email.includes("@")) {
-            alert("A valid email is needed to save your progress.");
-            return null;
-        }
-        email = email.trim().toLowerCase();
-        localStorage.setItem("powerup_email", email);
-    }
-    return email;
+// Mark a course complete — saved locally only, no email needed
+function completeCourse(id) {
+    localStorage.setItem("course_" + id, "completed");
+    createCourses();
 }
 
-async function completeCourse(id) {
-    const course = courses.find(c => c.id === id);
-    const userEmail = getUserEmail();
-    if (!userEmail) return;
+function getCompletedCourses() {
+    return courses.filter(c => localStorage.getItem("course_" + c.id) === "completed");
+}
 
+function updateProgress() {
+    const completed = getCompletedCourses().length;
+    const percentage = Math.round(completed / courses.length * 100);
+    document.getElementById("progressBar").style.width = percentage + "%";
+    document.getElementById("progressText").innerHTML =
+        `✅ ${completed} of ${courses.length} completed (${percentage}%)`;
+}
+
+// Button is only active after at least one course is completed
+function updateGiveawayState() {
+    const hasCompleted = getCompletedCourses().length > 0;
+    const button = document.getElementById("giveawayButton");
+    const message = document.getElementById("giveawayMessage");
+    button.disabled = !hasCompleted;
+    if (!hasCompleted) {
+        message.className = "giveaway-message";
+        message.textContent = "Complete at least one course to unlock the prize draw.";
+    } else if (message.textContent.startsWith("Complete at least")) {
+        message.textContent = "";
+    }
+}
+
+function showGiveawayMessage(text, type) {
+    const message = document.getElementById("giveawayMessage");
+    message.className = "giveaway-message " + type;
+    message.textContent = text;
+}
+
+async function submitGiveaway() {
+    const completedCourses = getCompletedCourses();
+    const emailInput = document.getElementById("giveawayEmail");
+    const consent = document.getElementById("giveawayConsent");
+    const button = document.getElementById("giveawayButton");
+    const email = emailInput.value.trim().toLowerCase();
+
+    if (completedCourses.length === 0) {
+        showGiveawayMessage("Complete at least one course to join the prize draw.", "error");
+        return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showGiveawayMessage("Please enter a valid email address.", "error");
+        return;
+    }
+    if (!consent.checked) {
+        showGiveawayMessage("Please tick the box to agree before joining.", "error");
+        return;
+    }
+
+    button.disabled = true;
     try {
         const response = await fetch(FLOW_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                userEmail: userEmail,
-                courseId: course.id,
-                courseName: course.name,
-                status: "Completed"
+                userEmail: email,
+                courseId: completedCourses.length,
+                courseName: completedCourses.map(c => c.name).join("; "),
+                status: "Prize Draw Entry"
             })
         });
 
         if (response.ok) {
-            localStorage.setItem("course_" + id, "completed");
-            
-            createCourses();
+            showGiveawayMessage("🎉 You're in! Good luck in this month's prize draw.", "success");
+            emailInput.value = "";
+            consent.checked = false;
         } else {
             console.error(await response.text());
-            
+            showGiveawayMessage("Something went wrong. Please try again later.", "error");
         }
     } catch (error) {
         console.error(error);
-        
+        showGiveawayMessage("Something went wrong. Please try again later.", "error");
+    } finally {
+        button.disabled = getCompletedCourses().length === 0;
     }
-}
-
-function updateProgress() {
-    let completed = 0;
-    courses.forEach(course => {
-        if (localStorage.getItem("course_" + course.id) === "completed") completed++;
-    });
-    const percentage = Math.round(completed / courses.length * 100);
-    document.getElementById("progressBar").style.width = percentage + "%";
-    document.getElementById("progressText").innerHTML =
-        `✅ ${completed} of ${courses.length} completed (${percentage}%)`;
 }
 
 createCourses();
