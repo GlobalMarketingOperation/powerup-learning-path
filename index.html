@@ -21,6 +21,10 @@ button:hover { opacity:.9; }
 button:disabled { opacity:.4; cursor:not-allowed; }
 .completed-label { font-weight:bold; margin-top:10px; }
 
+/* NEW: Undo button */
+.undo-btn { background:transparent; color:black; border:1px solid black; }
+.undo-btn:hover { background:rgba(0,0,0,.1); }
+
 /* Prize draw section */
 .giveaway { margin-top:40px; background:#1F1F1F; border:2px solid #43d18d; border-radius:12px; padding:25px; max-width:1200px; }
 .giveaway h2 { margin-top:0; color:#43d18d; }
@@ -103,7 +107,8 @@ function createCourses() {
             <div class="actions">
                 <button type="button" onclick="openCourse('${course.url}')">Start Course</button>
                 ${completed
-                    ? `<div class="completed-label">Completed</div>`
+                    ? `<button type="button" class="undo-btn" onclick="undoCourse(${course.id})">↩ Undo</button>
+                       <div class="completed-label">Completed</div>`
                     : `<button type="button" onclick="completeCourse(${course.id})">Mark Complete</button>`}
             </div>`;
         courseGrid.appendChild(card);
@@ -119,6 +124,12 @@ function openCourse(url) {
 // Mark a course complete — saved locally only, no email needed
 function completeCourse(id) {
     localStorage.setItem("course_" + id, "completed");
+    createCourses();
+}
+
+// NEW: Remove the "completed" status from a course
+function undoCourse(id) {
+    localStorage.removeItem("course_" + id);
     createCourses();
 }
 
